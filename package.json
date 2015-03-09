@@ -1,7 +1,7 @@
 {
-  "name": "node-module-template",
-  "version": "1.0.1",
-  "description": "A description of your module",
+  "name": "ent-drivers",
+  "version": "1.0.2",
+  "description": "Driver-related classes and utilities",
   "main": "lib/index.js",
   "directories": {
     "test": "test"
