@@ -1,6 +1,6 @@
 {
   "name": "node-module-template",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A description of your module",
   "main": "lib/index.js",
   "directories": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "module_git_repo"
+    "url": "https://github.com/entrinsik-org/drivers"
   },
   "author": "",
   "license": "MIT",
