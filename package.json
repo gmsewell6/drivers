@@ -1,6 +1,6 @@
 {
   "name": "ent-drivers",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Driver-related classes and utilities",
   "main": "lib/index.js",
   "directories": {
