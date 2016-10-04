@@ -29,6 +29,18 @@ describe('DriverManager', function () {
         should.exist(driver);
     });
 
+    it('should add an array of valid drivers', function () {
+        var results = drivers.addAll([
+            { id: 'foo', name: 'Foo Driver' },
+            { id: 'bar', name: 'Bar Driver' }
+        ]);
+
+        results.should.have.lengthOf(2);
+        drivers.all().should.have.lengthOf(2);
+        drivers.get('foo');
+        drivers.get('bar');
+    });
+
     it('should create a default joi schema with id', function () {
         var drivers = new DriverManager('default');
         drivers.add.bind(drivers, {}).should.throw('"id" is required');
