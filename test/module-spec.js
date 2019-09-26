@@ -1,16 +1,19 @@
 'use strict';
 
-var should = require('chai').should();
-var joi = require('joi');
-var DriverManager = require('../').DriverManager;
+const should = require('chai').should();
+const joi = require('joi');
+const DriverManager = require('../').DriverManager;
 
 describe('DriverManager', function () {
-    var schema = {
+    const schema = {
         id: joi.string().required(),
         name: joi.string().required(),
-        getName: joi.func().default(function() { return this.name }) };
+        getName: joi.func().default(function () {
+            return this.name;
+        })
+    };
 
-    var drivers;
+    let drivers;
 
     beforeEach(function () {
         drivers = new DriverManager('driver', schema);
@@ -25,12 +28,12 @@ describe('DriverManager', function () {
     });
 
     it('should add a valid driver', function () {
-        var driver = drivers.add({ id: 'foo', name: 'Foo Driver' });
+        const driver = drivers.add({ id: 'foo', name: 'Foo Driver' });
         should.exist(driver);
     });
 
     it('should add an array of valid drivers', function () {
-        var results = drivers.addAll([
+        const results = drivers.addAll([
             { id: 'foo', name: 'Foo Driver' },
             { id: 'bar', name: 'Bar Driver' }
         ]);
@@ -42,8 +45,35 @@ describe('DriverManager', function () {
     });
 
     it('should create a default joi schema with id', function () {
-        var drivers = new DriverManager('default');
+        const drivers = new DriverManager('default');
         drivers.add.bind(drivers, {}).should.throw('"id" is required');
+    });
+
+    it(`should return the configured 'missing' driver instead of throwing when getting an unknown driver, if one was provided to the driver manager`, () => {
+        const drivers = new DriverManager('things', schema, null, { name: 'Missing Driver' });
+        drivers.get.bind(drivers, 'foo').should.not.throw;
+        const found = drivers.get('foo');
+        should.exist(found);
+        found.should.be.an('Object');
+        found.should.have.property('id', '$$missing');
+        found.should.equal(drivers.missing);
+    });
+
+    it(`should force the id of the missing driver to be '$$missing'`, () => {
+        const drivers = new DriverManager('things', schema, null, { id: 'temporary', name: 'Missing Driver' });
+        should.exist(drivers.missing);
+        drivers.missing.should.have.property('id', '$$missing');
+    });
+
+    it(`should validate a manually configured 'missing' driver`, () => {
+        const drivers = new DriverManager('things', schema);
+        drivers.missing = { name: 'Missing Driver' };
+        drivers.missing.should.have.property('id', '$$missing');
+        const found = drivers.get('foo');
+        should.exist(found);
+        found.should.be.an('Object');
+        found.should.have.property('id', '$$missing');
+        found.should.equal(drivers.missing);
     });
 
     describe('when valid drivers have been registered', function () {
@@ -57,7 +87,7 @@ describe('DriverManager', function () {
         });
 
         it('should return all the drivers', function () {
-            var values = drivers.all();
+            const values = drivers.all();
             values.should.have.length(2);
             values[0].getName().should.equal('Foo Driver');
         });
@@ -75,7 +105,7 @@ describe('DriverManager', function () {
         });
 
         it('should return a hash of all the drivers', function () {
-            var newDrivers = drivers.get();
+            const newDrivers = drivers.get();
             newDrivers.should.have.property('foo');
             newDrivers.should.have.property('bar');
         });
