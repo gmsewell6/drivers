@@ -49,31 +49,72 @@ describe('DriverManager', function () {
         drivers.add.bind(drivers, {}).should.throw('"id" is required');
     });
 
-    it(`should return the configured 'missing' driver instead of throwing when getting an unknown driver, if one was provided to the driver manager`, () => {
-        const drivers = new DriverManager('things', schema, null, { name: 'Missing Driver' });
-        drivers.get.bind(drivers, 'foo').should.not.throw;
-        const found = drivers.get('foo');
-        should.exist(found);
-        found.should.be.an('Object');
-        found.should.have.property('id', '$$missing');
-        found.should.equal(drivers.missing);
-    });
+    describe(`missing driver`, () => {
+        it(`should return the configured 'missing' driver instead of throwing when getting an unknown driver, if one was provided to the driver manager`, () => {
+            const drivers = new DriverManager('things', schema, null, () => ({ name: 'Missing Driver' }));
+            drivers.get.bind(drivers, 'foo').should.not.throw;
+            const found = drivers.get('foo');
+            should.exist(found);
+            found.should.be.an('Object');
+            found.should.have.property('id', 'missing');
+            found.should.deep.equal(drivers.missing('foo'));
+        });
 
-    it(`should force the id of the missing driver to be '$$missing'`, () => {
-        const drivers = new DriverManager('things', schema, null, { id: 'temporary', name: 'Missing Driver' });
-        should.exist(drivers.missing);
-        drivers.missing.should.have.property('id', '$$missing');
-    });
+        it(`should dynamically generate a missing driver based on the requested driver id`, () => {
+            const drivers = new DriverManager('things', schema, null, id => ({ name: `Missing Driver: ${id}` }));
+            drivers.get.bind(drivers, 'foo').should.not.throw;
+            const foundFoo = drivers.get('foo');
+            should.exist(foundFoo);
+            foundFoo.should.be.an('Object');
+            foundFoo.should.have.property('id', 'missing');
+            foundFoo.should.have.property('name', 'Missing Driver: foo');
+            foundFoo.should.deep.equal(drivers.missing('foo'));
+            const foundBar = drivers.get('bar');
+            should.exist(foundBar);
+            foundBar.should.be.an('Object');
+            foundBar.should.have.property('id', 'missing');
+            foundBar.should.have.property('name', 'Missing Driver: bar');
+            foundBar.should.deep.equal(drivers.missing('bar'));
+        });
 
-    it(`should validate a manually configured 'missing' driver`, () => {
-        const drivers = new DriverManager('things', schema);
-        drivers.missing = { name: 'Missing Driver' };
-        drivers.missing.should.have.property('id', '$$missing');
-        const found = drivers.get('foo');
-        should.exist(found);
-        found.should.be.an('Object');
-        found.should.have.property('id', '$$missing');
-        found.should.equal(drivers.missing);
+        it(`should force the id of the missing driver to be 'missing'`, () => {
+            const drivers = new DriverManager('things', schema, null, () => ({
+                id: 'temporary',
+                name: 'Missing Driver'
+            }));
+            should.exist(drivers.missing);
+            drivers.missing().should.have.property('id', 'missing');
+            drivers.get('foo').should.have.property('id', 'missing');
+        });
+
+        it(`should validate a manually configured 'missing' driver`, () => {
+            const drivers = new DriverManager('things', schema);
+            drivers.missing = () => ({ name: 'Missing Driver' });
+            drivers.missing().should.have.property('id', 'missing');
+            const found = drivers.get('foo');
+            should.exist(found);
+            found.should.be.an('Object');
+            found.should.have.property('id', 'missing');
+            found.should.deep.equal(drivers.missing());
+        });
+
+        it(`should not allow a driver with id = 'missing' to be added when one has been configured on the manager`, () => {
+            const drivers = new DriverManager('things', schema, null, () => ({ name: 'Missing Driver' }));
+            drivers.add.bind(drivers, { id: 'missing', name: 'Registered Missing Driver' }).should.throw();
+        });
+
+        it(`should not allow a default 'missing' driver to be set after a driver with the id 'missing' has been registered`, () => {
+            const drivers = new DriverManager('things', schema, null);
+            drivers.add({ id: 'missing', name: 'Missing Driver' });
+            let error;
+            try {
+                drivers.missing = () => ({ name: 'Missing Driver set late' });
+            } catch (err) {
+                error = err;
+            }
+            should.exist(error);
+            error.should.have.property('message', `Cannot configure a default 'missing' driver when a driver with that id has already been added`);
+        });
     });
 
     describe('when valid drivers have been registered', function () {
@@ -108,6 +149,10 @@ describe('DriverManager', function () {
             const newDrivers = drivers.get();
             newDrivers.should.have.property('foo');
             newDrivers.should.have.property('bar');
+        });
+
+        it(`should return undefined if requesting a driver with an id argument but undefined value`, () => {
+            should.not.exist(drivers.get(undefined));
         });
 
         it('should remove a driver', function () {
