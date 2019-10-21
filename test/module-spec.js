@@ -151,10 +151,6 @@ describe('DriverManager', function () {
             newDrivers.should.have.property('bar');
         });
 
-        it(`should return undefined if requesting a driver with an id argument but undefined value`, () => {
-            should.not.exist(drivers.get(undefined));
-        });
-
         it('should remove a driver', function () {
             drivers.remove('bar');
             drivers.keys().should.have.length(1);
