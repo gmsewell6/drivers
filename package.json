@@ -16,7 +16,9 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "bluebird": "~2.11.0",
     "chai": "^3.5.0",
+    "chai-as-promised": "^7.1.1",
     "eslint": "^5.16.0",
     "gulp": "^3.8.11",
     "gulp-bump": "^3.1.1",
@@ -27,7 +29,9 @@
     "gulp-load-plugins": "^2.0.0",
     "gulp-mocha": "^6.0.0",
     "gulp-tag-version": "^1.2.1",
-    "mocha": "^5.2.0"
+    "mocha": "^5.2.0",
+    "sinon": "^7.5.0",
+    "sinon-chai": "^3.3.0"
   },
   "dependencies": {
     "boom": "4.2.0",
