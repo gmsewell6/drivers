@@ -1,6 +1,6 @@
 {
   "name": "ent-drivers",
-  "version": "2.1.1-core560.0",
+  "version": "2.1.1",
   "description": "Driver-related classes and utilities",
   "main": "lib/index.js",
   "directories": {
