@@ -53,11 +53,12 @@ describe('DriverManager', function () {
     });
 
     describe(`missing driver`, () => {
-        let defaultSyncFn, defaultAsyncFn;
+        let defaultSyncFn, defaultAsyncFn, defaultExpandFn;
 
         beforeEach(() => {
             defaultSyncFn = () => 'sync';
             defaultAsyncFn = async () => 'async';
+            defaultExpandFn = () => '';
 
             schema = {
                 id: joi.string().required(),
@@ -68,7 +69,8 @@ describe('DriverManager', function () {
                 requiredAsyncFn: joi.func().required().tags('async'),
                 optionalSyncFn: joi.func(),
                 optionalAsyncFn: joi.func().tags('async'),
-                taggedAsyncFn: joi.func().default(defaultSyncFn).tags('async')
+                taggedAsyncFn: joi.func().default(defaultSyncFn).tags('async'),
+                expandFn: joi.func().forbidden().default(defaultExpandFn)
             };
 
             drivers = new DriverManager('things', schema);
@@ -292,6 +294,15 @@ describe('DriverManager', function () {
             }
             should.exist(error);
             error.should.have.property('message', `Cannot configure a default 'missing' driver when a driver with that id has already been added`);
+        });
+
+        it(`should not try to add a forbidden property`, () => {
+            drivers.missing = id => ({ name: `Missing Driver: ${id}` });
+            drivers.get.bind(drivers, 'foo').should.not.throw;
+            const foundFoo = drivers.get('foo');
+            should.exist(foundFoo);
+            foundFoo.should.be.an('Object');
+            foundFoo.should.have.property('expandFn', defaultExpandFn);
         });
     });
 
