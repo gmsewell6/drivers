@@ -1,6 +1,6 @@
 {
   "name": "@entrinsik/ent-drivers",
-  "version": "2.2.0-core590.0",
+  "version": "2.2.0",
   "description": "Driver-related classes and utilities",
   "main": "lib/index.js",
   "directories": {
