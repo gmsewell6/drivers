@@ -1,6 +1,6 @@
 {
-  "name": "ent-drivers",
-  "version": "2.1.1",
+  "name": "@entrinsik/ent-drivers",
+  "version": "2.2.0",
   "description": "Driver-related classes and utilities",
   "main": "lib/index.js",
   "directories": {
@@ -12,6 +12,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/entrinsik-org/drivers"
+  },
+  "publishConfig": {
+    "registry": "https://docker.entrinsik.com/repository/entNPM/"
   },
   "author": "",
   "license": "MIT",
@@ -36,6 +39,6 @@
   "dependencies": {
     "boom": "4.2.0",
     "joi": "~9.2.0",
-    "lodash": "~3.10.1"
+    "lodash": "^4.17.21"
   }
 }
